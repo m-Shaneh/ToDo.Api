@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using ToDo.Api;
 using ToDo.Core;
+using ToDo.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Configure the database
 var connectionString = builder.Configuration.GetConnectionString("Todos");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer( connectionString));
+    options.UseSqlServer(connectionString));
 
 
 builder.Services.AddControllers();

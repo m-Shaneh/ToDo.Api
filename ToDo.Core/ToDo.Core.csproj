@@ -13,7 +13,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
     <PackageReference Include="NodaTime" Version="2.4.6" />
     <PackageReference Include="Sendgrid" Version="9.10.0" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

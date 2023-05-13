@@ -209,7 +209,7 @@ namespace ToDo.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
+                    b.HasIndex("NormalizedEmail")a
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
@@ -218,6 +218,8 @@ namespace ToDo.Core.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    
                 });
 
             modelBuilder.Entity("ToDo.Core.Models.FileInfo", b =>

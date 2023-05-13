@@ -12,7 +12,7 @@ using ToDo.Core;
 namespace ToDo.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230513115704_initial")]
+    [Migration("20230513120418_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
