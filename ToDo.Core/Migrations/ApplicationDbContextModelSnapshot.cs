@@ -209,7 +209,7 @@ namespace ToDo.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")a
+                    b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
