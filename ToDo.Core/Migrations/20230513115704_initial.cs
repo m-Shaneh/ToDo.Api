@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ToDo.Api.Migrations
+namespace ToDo.Core.Migrations
 {
     public partial class initial : Migration
     {
@@ -28,7 +28,7 @@ namespace ToDo.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -46,7 +46,19 @@ namespace ToDo.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.UniqueConstraint("AK_AspNetUsers_UserName", x => x.UserName);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "File",
+                columns: table => new
+                {
+                    TodoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Size = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_File", x => x.TodoId);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,24 +168,27 @@ namespace ToDo.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Todos",
+                name: "Todo",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    moment = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    IsComplete = table.Column<bool>(type: "bit", nullable: false),
-                    OwnerId = table.Column<string>(type: "nvarchar(256)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Done = table.Column<bool>(type: "bit", nullable: false),
+                    FileTodoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Added = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueTo = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Tags = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Todos", x => x.Id);
+                    table.PrimaryKey("PK_Todo", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Todos_AspNetUsers_OwnerId",
-                        column: x => x.OwnerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "UserName",
+                        name: "FK_Todo_File_FileTodoId",
+                        column: x => x.FileTodoId,
+                        principalTable: "File",
+                        principalColumn: "TodoId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -217,9 +232,9 @@ namespace ToDo.Api.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Todos_OwnerId",
-                table: "Todos",
-                column: "OwnerId");
+                name: "IX_Todo_FileTodoId",
+                table: "Todo",
+                column: "FileTodoId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -240,13 +255,16 @@ namespace ToDo.Api.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Todos");
+                name: "Todo");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "File");
         }
     }
 }

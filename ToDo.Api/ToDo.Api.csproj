@@ -21,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Authentication\" />
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ToDo.Core\ToDo.Core.csproj" />
   </ItemGroup>
 
 </Project>
