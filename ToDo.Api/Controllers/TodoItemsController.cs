@@ -24,8 +24,8 @@ namespace ToDo.Api.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<TodoItemsController> _logger;
 
-        public TodoItemsController(UserManager<ApplicationUser> userManager, 
-            ITodoItemService todoService, 
+        public TodoItemsController(UserManager<ApplicationUser> userManager,
+            ITodoItemService todoService,
             IFileStorageService fileStorageService,
             IMapper mapper,
             ILogger<TodoItemsController> logger)
@@ -42,7 +42,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetAllAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried getting all items.");
                 return Unauthorized();
@@ -55,43 +55,12 @@ namespace ToDo.Api.Controllers
             return Ok(items);
         }
 
-        // Get done/non-done items
-        [HttpGet("complete")]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetCompleteItemsAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if(user == null)
-            {
-                _logger.LogError($"Unknown user tried getting all complete items.");
-                return Unauthorized();
-            }
-            var items = await _todoService.GetCompleteItemsAsync(user);
-
-            _logger.LogInformation($"Returned all complete items to {user.Email}");
-            return Ok(items);
-        }
-
-        [HttpGet("incomplete")]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetIncompleteItemsAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if(user == null)
-            {
-                _logger.LogError($"Unknown user tried getting all incomplete items.");
-                return Unauthorized();
-            }
-            var items = await _todoService.GetIncompleteItemsAsync(user);
-
-            _logger.LogInformation($"Returned all incomplete items to {user.Email}");
-            return Ok(items);
-        }
-
         // Get items by tag
         [HttpGet("bytag/{tag}")]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetItemsByTag(string tag)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried getting all items with tag {tag}.");
                 return Unauthorized();
@@ -107,7 +76,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetItemById(Guid id)
         {
             var item = await _todoService.GetItemAsync(id);
-            if(item == null)
+            if (item == null)
             {
                 _logger.LogError($"Item with id {id} not found.");
                 return NotFound();
@@ -122,7 +91,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult<TodoItem>> CreateItem([FromBody] TodoItemDto item)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried creating an item.");
                 return Unauthorized();
@@ -156,7 +125,7 @@ namespace ToDo.Api.Controllers
         public async Task<IActionResult> UploadFile(Guid todoId, IFormFile file)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried creating an item.");
                 return Unauthorized();
@@ -169,7 +138,7 @@ namespace ToDo.Api.Controllers
             }
 
             var item = await _todoService.GetItemAsync(todoId);
-            if(item == null)
+            if (item == null)
             {
                 _logger.LogError($"Item with id {todoId} not found.");
                 return NotFound();
@@ -198,7 +167,7 @@ namespace ToDo.Api.Controllers
                 return BadRequest("Couldn't create or replace file.");
             }
 
-            return CreatedAtAction(nameof(GetItemById), new {Id = todoId}, item);
+            return CreatedAtAction(nameof(GetItemById), new { Id = todoId }, item);
         }
 
         // Update item
@@ -206,7 +175,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult<TodoItem>> UpdateItemAsync([FromBody] TodoItemDto newItem, Guid id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried creating an item.");
                 return Unauthorized();
@@ -232,7 +201,11 @@ namespace ToDo.Api.Controllers
                 _logger.LogError($"Item with id {id} not found.");
                 return NotFound();
             }
-
+            if (dbItem.UserId != user.Id)
+            {
+                _logger.LogError($"The current user cannot edit this task.");
+                return BadRequest();
+            }
             dbItem = _mapper.Map<TodoItem>(newItem);
             if (dbItem.Done)
                 await _todoService.UpdateDoneAsync(id, user);
@@ -248,7 +221,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult> UpdateStatus(Guid id, bool status)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried creating an item.");
                 return Unauthorized();
@@ -259,6 +232,11 @@ namespace ToDo.Api.Controllers
             {
                 _logger.LogError($"Item with id {id} not found.");
                 return NotFound();
+            }
+            if (item.UserId != user.Id)
+            {
+                _logger.LogError($"The current user cannot edit this task.");
+                return BadRequest();
             }
 
             if (status)
@@ -275,7 +253,7 @@ namespace ToDo.Api.Controllers
         public async Task<ActionResult> DeleteItem(Guid id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogError($"Unknown user tried creating an item.");
                 return Unauthorized();

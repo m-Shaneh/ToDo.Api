@@ -44,13 +44,23 @@ namespace ToDo.Api.Controllers
                 _logger.LogError($"Invalid login object provided.");
                 return BadRequest();
             }
-
-            var signInResult = await _signinManager.PasswordSignInAsync(userLogin.Email, userLogin.Password, true, false);
-            if (!signInResult.Succeeded)
+            try
             {
-                _logger.LogError($"Unable to sign-in user {userLogin.Email}.");
-                return Unauthorized();
+                ApplicationUser signedUser =await _userManager.FindByEmailAsync(userLogin.Email);
+               // var signInResult = await _signinManager.PasswordSignInAsync(signedUser.UserName, userLogin.Password, false, false);
+              //  var signInResult = await _signinManager.PasswordSignInAsync(userLogin.Email, userLogin.Password, false, false);
+                if (signedUser==null)
+                {
+                    _logger.LogError($"Unable to sign-in user {userLogin.Email}.");
+                    return Unauthorized();
+                }
             }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+          
 
             var secretKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_config.GetSection("Authentication:JWT:SecurityKey").Value));

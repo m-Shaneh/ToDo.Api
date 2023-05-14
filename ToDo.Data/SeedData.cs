@@ -24,16 +24,16 @@ namespace ToDo.Data
         private static async Task AddAdminRights(UserManager<ApplicationUser> userManager)
         {
             var adminExists = userManager.Users
-                .Any(x => x.UserName == "admin@admin.local");
+                .Any(x => x.UserName == "shaneh");
 
             if (!adminExists)
             {
                 var admin = new ApplicationUser
                 {
-                    Email = "admin@admin.local",
-                    UserName = "admin@admin.local"
+                    Email = "shaneh@gmail.com",
+                    UserName = "shaneh"
                 };
-                await userManager.CreateAsync(admin, "Admin1!");
+                await userManager.CreateAsync(admin, "Shaneh1!");
                 await userManager.AddToRoleAsync(
                     admin, Constants.AdministratorRole);
             }

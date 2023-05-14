@@ -219,7 +219,7 @@ namespace ToDo.Core.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    
+                  
                 });
 
             modelBuilder.Entity("ToDo.Core.Models.FileInfo", b =>
